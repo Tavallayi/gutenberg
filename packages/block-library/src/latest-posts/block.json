@@ -62,11 +62,11 @@
 		},
 		"featuredImageSizeWidth": {
 			"type": "number",
-			"default":null
+			"default":150
 		},
 		"featuredImageSizeHeight": {
 			"type": "number",
-			"default":null
+			"default":150
 		}
 	}
 }

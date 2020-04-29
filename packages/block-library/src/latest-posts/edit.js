@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component, RawHTML } from '@wordpress/element';
+import ServerSideRender from '@wordpress/server-side-render';
 import {
 	BaseControl,
 	PanelBody,
@@ -332,7 +333,11 @@ class LatestPostsEdit extends Component {
 				<BlockControls>
 					<ToolbarGroup controls={ layoutControls } />
 				</BlockControls>
-				<ul
+				<ServerSideRender
+					block="core/latest-posts"
+					attributes={ this.props.attributes }
+				/>
+				{ /* 				<ul
 					className={ classnames( this.props.className, {
 						'wp-block-latest-posts__list': true,
 						'is-grid': postLayout === 'grid',
@@ -374,7 +379,6 @@ class LatestPostsEdit extends Component {
 									.trim()
 									.split( ' ', excerptLength )
 									.join( ' ' ) }
-								{ /* translators: excerpt truncation character, default …  */ }
 								{ __( ' … ' ) }
 								<a
 									href={ post.link }
@@ -446,7 +450,7 @@ class LatestPostsEdit extends Component {
 							</li>
 						);
 					} ) }
-				</ul>
+				</ul>*/ }
 			</>
 		);
 	}

@@ -55,9 +55,14 @@ function render_block_core_latest_posts( $attributes ) {
 	$list_items_markup = '';
 
 	foreach ( $recent_posts as $post ) {
-
-		$list_items_markup .= '<li>';
-
+		$template              = '<div class="%1$s">%2$s</div>';
+		$template              = apply_filters(
+			'gutenberg-element-template',
+			$template,
+			'core/latest-posts',
+			'FeaturedImage'
+		);
+		$featured_image_markup = '';
 		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
 			$image_style = '';
 			if ( isset( $attributes['featuredImageSizeWidth'] ) ) {
@@ -72,8 +77,8 @@ function render_block_core_latest_posts( $attributes ) {
 				$image_classes .= ' align' . $attributes['featuredImageAlign'];
 			}
 
-			$list_items_markup .= sprintf(
-				'<div class="%1$s">%2$s</div>',
+			$featured_image_markup = sprintf(
+				$template,
 				$image_classes,
 				get_the_post_thumbnail(
 					$post,
@@ -85,44 +90,95 @@ function render_block_core_latest_posts( $attributes ) {
 			);
 		}
 
-		$title = get_the_title( $post );
+		$template = '<a href="%1$s">%2$s</a>';
+		$template = apply_filters(
+			'gutenberg-element-template',
+			$template,
+			'core/latest-posts',
+			'Title'
+		);
+		$title    = get_the_title( $post );
 		if ( ! $title ) {
 			$title = __( '(no title)' );
 		}
-		$list_items_markup .= sprintf(
-			'<a href="%1$s">%2$s</a>',
+		$title_markup = sprintf(
+			$template,
 			esc_url( get_permalink( $post ) ),
 			$title
 		);
 
+		$template = '<time datetime="%1$s" class="wp-block-latest-posts__post-date">%2$s</time>';
+		$template = apply_filters(
+			'gutenberg-element-template',
+			$template,
+			'core/latest-posts',
+			'PostDate'
+		);
+
+		$post_date_markup = '';
 		if ( isset( $attributes['displayPostDate'] ) && $attributes['displayPostDate'] ) {
-			$list_items_markup .= sprintf(
+			$post_date_markup = sprintf(
 				'<time datetime="%1$s" class="wp-block-latest-posts__post-date">%2$s</time>',
 				esc_attr( get_the_date( 'c', $post ) ),
 				esc_html( get_the_date( '', $post ) )
 			);
 		}
 
+		$template = '<div class="wp-block-latest-posts__post-excerpt">%1$s</div>';
+		$template = apply_filters(
+			'gutenberg-element-template',
+			$template,
+			'core/latest-posts',
+			'PostContent_Excerpt'
+		);
+
+		$post_content_excerpt_markup = '';
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
-			&& isset( $attributes['displayPostContentRadio'] ) && 'excerpt' === $attributes['displayPostContentRadio'] ) {
+			&& isset( $attributes['displayPostContentRadio'] ) && 'excerpt' === $attributes['displayPostContentRadio']
+		) {
 
 			$trimmed_excerpt = get_the_excerpt( $post );
 
-			$list_items_markup .= sprintf(
-				'<div class="wp-block-latest-posts__post-excerpt">%1$s</div>',
+			$post_content_excerpt_markup = sprintf(
+				$template,
 				$trimmed_excerpt
 			);
 		}
 
+		$template = '<div class="wp-block-latest-posts__post-excerpt">%1$s</div>';
+		$template = apply_filters(
+			'gutenberg-element-template',
+			$template,
+			'core/latest-posts',
+			'PostContent_FullPost'
+		);
+
+		$post_content_full_post_markup = '';
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
-			&& isset( $attributes['displayPostContentRadio'] ) && 'full_post' === $attributes['displayPostContentRadio'] ) {
-			$list_items_markup .= sprintf(
-				'<div class="wp-block-latest-posts__post-full-content">%1$s</div>',
+			&& isset( $attributes['displayPostContentRadio'] ) && 'full_post' === $attributes['displayPostContentRadio']
+		) {
+			$post_content_full_post_markup = sprintf(
+				$template,
 				wp_kses_post( html_entity_decode( $post->post_content, ENT_QUOTES, get_option( 'blog_charset' ) ) )
 			);
 		}
 
-		$list_items_markup .= "</li>\n";
+		$template          .= '<li>%1$s%2$s</li>';
+		$template           = apply_filters(
+			'gutenberg-element-template',
+			$template,
+			'core/latest-posts',
+			'PostItem'
+		);
+		$list_items_markup .= sprintf(
+			$template,
+			$featured_image_markup,
+			$title_markup,
+			$post_date_markup,
+			$post_content_excerpt_markup,
+			$post_content_full_post_markup
+		);
+
 	}
 
 	remove_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
